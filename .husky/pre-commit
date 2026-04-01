@@ -1,0 +1,2 @@
+cd apihub-backend
+npx lint-staged
