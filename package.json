@@ -1,0 +1,29 @@
+{
+  "name": "apihub",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:backend": "npm run dev -w @apihub/backend",
+    "build:backend": "npm run build -w @apihub/backend",
+    "format": "prettier --write \"packages/**/src/**/*.ts\"",
+    "lint": "eslint \"packages/**/src/**/*.ts\""
+  },
+  "devDependencies": {
+    "prettier": "^3.0.0",
+    "eslint": "^8.0.0",
+    "eslint-config-prettier": "^9.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "husky": "^9.0.0",
+    "lint-staged": "^15.0.0"
+  },
+  "lint-staged": {
+    "packages/**/src/**/*.ts": [
+      "prettier --write",
+      "eslint --fix",
+      "eslint"
+    ]
+  }
+}
