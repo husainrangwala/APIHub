@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import { authRouter } from './modules/auth/auth.router';
 
 dotenv.config();
 
@@ -16,7 +17,7 @@ app.get('/health', (_req, res) => {
 });
 
 // Routes will be mounted here as you build them
-// app.use('/auth', authRouter)
+app.use('/auth', authRouter);
 // app.use('/api-keys', apiKeysRouter)
 
 app.listen(PORT, () => {
