@@ -1,13 +1,8 @@
 import { db } from '../../config/db';
 import { users } from '../../db/schema';
 import type { NewUser } from '../../db/schema';
-import bcrypt from 'bcryptjs';
 import { AppError } from '../../lib/errors';
-
-const hashPassword = async (password: string): Promise<string> => {
-    const hashedPassword = await bcrypt.hash(password, 10);
-    return hashedPassword;
-};
+import { comparePasswords, createJWT, hashPassword } from '../../utils/auth.utils';
 
 const signup = async (firstName: string, lastName: string, email: string, password: string) => {
     try {
@@ -44,6 +39,30 @@ const signup = async (firstName: string, lastName: string, email: string, passwo
     }
 };
 
+const login = async (email: string, password: string) => {
+    try {
+        const user = await db.query.users.findFirst({
+            where: (users, { eq }) => eq(users.email, email),
+        });
+        if (!user) {
+            throw new AppError('Invalid email or password', 401);
+        }
+        const isPasswordValid = await comparePasswords(password, user.passwordHash);
+        if (!isPasswordValid) {
+            throw new AppError('Invalid email or password', 401);
+        }
+        const token = createJWT({ id: user.id, email: user.email });
+
+        const { passwordHash, ...userWithoutPassword } = user;
+        return { token, user: userWithoutPassword };
+    } catch (error) {
+        if (error instanceof AppError) throw error;
+        console.error('Login Error:', error);
+        throw new Error('Internal Server Error');
+    }
+};
+
 export const authService = {
     signup,
+    login,
 };
