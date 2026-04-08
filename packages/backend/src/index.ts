@@ -2,9 +2,9 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { authRouter } from './modules/auth/auth.router';
-import { requireAuth } from './middlewares/auth.middleware';
 import { apiKeysRouter } from './modules/apikeys/apikeys.router';
 import { requireApiKey } from './middlewares/apikey.middleware';
+import { errorHandler } from './middlewares/error.middleware';
 
 dotenv.config();
 
@@ -27,6 +27,8 @@ app.use('/api-keys', apiKeysRouter);
 app.get('/test', requireApiKey, (req, res) => {
     res.json({ message: 'Valid API key', user: req.user });
 });
+
+app.use(errorHandler);
 
 app.listen(PORT, () => {
     console.log(`APIHub running on http://localhost:${PORT}`);

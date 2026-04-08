@@ -6,13 +6,6 @@ import { AppError } from '../../lib/errors';
 
 const createApiKey = async (userId: string, name: string) => {
     try {
-        const user = await db.query.users.findFirst({
-            where: (users, { eq }) => eq(users.id, userId),
-        });
-        if (!user) {
-            throw new AppError('User not found', 404);
-        }
-
         const rawKey = generateApiKey();
         const keyHash = hashApiKey(rawKey);
 
@@ -40,13 +33,6 @@ const createApiKey = async (userId: string, name: string) => {
 };
 const listApiKeys = async (userId: string) => {
     try {
-        const user = await db.query.users.findFirst({
-            where: (users, { eq }) => eq(users.id, userId),
-        });
-        if (!user) {
-            throw new AppError('User not found', 404);
-        }
-
         const keys = await db.query.apiKeys.findMany({
             where: (apiKeys, { eq }) => eq(apiKeys.userId, userId),
             orderBy: (apiKeys, { desc }) => desc(apiKeys.createdAt),
@@ -69,19 +55,12 @@ const listApiKeys = async (userId: string) => {
 
 const revokeApiKey = async (userId: string, keyId: string) => {
     try {
-        const user = await db.query.users.findFirst({
-            where: (users, { eq }) => eq(users.id, userId),
-        });
-        if (!user) {
-            throw new AppError('User not found', 404);
-        }
-
         const key = await db
             .update(apiKeys)
             .set({ isActive: false })
             .where(and(eq(apiKeys.id, keyId), eq(apiKeys.userId, userId)))
             .returning();
-        if (!key) {
+        if (key.length === 0) {
             throw new AppError('API key not found', 404);
         }
         const [updatedKey] = key;

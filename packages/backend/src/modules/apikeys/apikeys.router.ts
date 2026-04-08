@@ -19,10 +19,7 @@ apiKeysRouter.post('/', async (req: Request, res: Response, next: NextFunction) 
         const apiKey = await createApiKey(userId, name);
         res.status(201).json({ message: 'API key created successfully', apiKey });
     } catch (error) {
-        if (error instanceof AppError) {
-            return res.status(error.statusCode).json({ message: error.message });
-        }
-        res.status(500).json({ message: 'Internal Server Error' });
+        next(error);
     }
 });
 
@@ -35,10 +32,7 @@ apiKeysRouter.get('/', async (req: Request, res: Response, next: NextFunction) =
         const keys = await listApiKeys(userId);
         res.json({ apiKeys: keys });
     } catch (error) {
-        if (error instanceof AppError) {
-            return res.status(error.statusCode).json({ message: error.message });
-        }
-        res.status(500).json({ message: 'Internal Server Error' });
+        next(error);
     }
 });
 
@@ -57,10 +51,7 @@ apiKeysRouter.delete('/:id', async (req: Request, res: Response, next: NextFunct
         const revokedKey = await revokeApiKey(userId, keyId);
         res.json({ message: 'API key revoked successfully', apiKey: revokedKey });
     } catch (error) {
-        if (error instanceof AppError) {
-            return res.status(error.statusCode).json({ message: error.message });
-        }
-        res.status(500).json({ message: 'Internal Server Error' });
+        next(error);
     }
 });
 
