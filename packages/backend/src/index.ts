@@ -5,6 +5,7 @@ import { authRouter } from './modules/auth/auth.router';
 import { apiKeysRouter } from './modules/apikeys/apikeys.router';
 import { requireApiKey } from './middlewares/apikey.middleware';
 import { errorHandler } from './middlewares/error.middleware';
+import { rateLimitMiddleware } from './middlewares/ratelimit.middleware';
 
 dotenv.config();
 
@@ -24,7 +25,7 @@ app.use('/auth', authRouter);
 app.use('/api-keys', apiKeysRouter);
 
 // test route — protected by API key (not JWT)
-app.get('/test', requireApiKey, (req, res) => {
+app.get('/test', requireApiKey, rateLimitMiddleware, (req, res) => {
     res.json({ message: 'Valid API key', user: req.user });
 });
 
