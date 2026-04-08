@@ -7,16 +7,18 @@ export const requireAuth = (req: Request, res: Response, next: NextFunction) => 
     try {
         const authHeader = req.headers.authorization;
         if (!authHeader || !authHeader.startsWith('Bearer ')) {
-            next(new AppError('Authorization header missing or malformed', 401));
-            return;
+            return next(new AppError('Authorization header missing or malformed', 401));
         }
         const token = authHeader.split(' ')[1];
         const decoded = decodeJwt(token) as { id: string; email: string };
+        if (!decoded) {
+            return next(new AppError('Invalid token', 401));
+        }
         req.user = decoded;
         next();
     } catch (error) {
         if (error instanceof jwt.JsonWebTokenError || error instanceof jwt.TokenExpiredError) {
-            throw new AppError('Invalid or expired token', 401);
+            return next(new AppError('Invalid or expired token', 401));
         }
         next(error);
     }

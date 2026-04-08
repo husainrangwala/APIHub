@@ -14,7 +14,7 @@ export const apiKeys = pgTable('api_keys', {
     userId: uuid('user_id')
         .references(() => users.id, { onDelete: 'cascade' })
         .notNull(),
-    key: text('key').notNull().unique(),
+    keyHash: text('key_hash').notNull().unique(),
     name: text('name').notNull(),
     isActive: boolean('is_active').default(true).notNull(),
     requestCount: integer('request_count').default(0).notNull(),

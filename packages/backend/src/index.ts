@@ -3,6 +3,8 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { authRouter } from './modules/auth/auth.router';
 import { requireAuth } from './middlewares/auth.middleware';
+import { apiKeysRouter } from './modules/apikeys/apikeys.router';
+import { requireApiKey } from './middlewares/apikey.middleware';
 
 dotenv.config();
 
@@ -19,11 +21,12 @@ app.get('/health', (_req, res) => {
 
 // Routes will be mounted here as you build them
 app.use('/auth', authRouter);
-//temportarily add a protected route to test auth middleware
-app.get('/auth/me', requireAuth, (req, res) => {
-    res.json({ user: req.user });
+app.use('/api-keys', apiKeysRouter);
+
+// test route — protected by API key (not JWT)
+app.get('/test', requireApiKey, (req, res) => {
+    res.json({ message: 'Valid API key', user: req.user });
 });
-// app.use('/api-keys', apiKeysRouter)
 
 app.listen(PORT, () => {
     console.log(`APIHub running on http://localhost:${PORT}`);
