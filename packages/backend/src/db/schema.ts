@@ -21,7 +21,19 @@ export const apiKeys = pgTable('api_keys', {
     createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
-// TypeScript types inferred automatically from schema
+export const requestLogs = pgTable('request_logs', {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id').references(() => users.id, { onDelete: 'set null' }),
+    apiKeyId: uuid('api_key_id').references(() => apiKeys.id, { onDelete: 'set null' }),
+    method: text('method').notNull(),
+    endpoint: text('endpoint').notNull(),
+    statusCode: integer('status_code').notNull(),
+    responseTimeMs: integer('response_time_ms').notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+export type RequestLog = typeof requestLogs.$inferSelect;
+export type NewRequestLog = typeof requestLogs.$inferInsert;
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 export type ApiKey = typeof apiKeys.$inferSelect;

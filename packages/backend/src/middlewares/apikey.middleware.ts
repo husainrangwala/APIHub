@@ -41,6 +41,7 @@ export const requireApiKey = async (req: Request, res: Response, next: NextFunct
             id: keyRecord.userId,
             email: user?.email || '',
         };
+        req.apiKeyId = keyRecord.id;
         next();
     } catch (error) {
         next(error);

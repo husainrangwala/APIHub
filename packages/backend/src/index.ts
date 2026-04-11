@@ -6,6 +6,7 @@ import { apiKeysRouter } from './modules/apikeys/apikeys.router';
 import { requireApiKey } from './middlewares/apikey.middleware';
 import { errorHandler } from './middlewares/error.middleware';
 import { rateLimitMiddleware } from './middlewares/ratelimit.middleware';
+import { requestLogger } from './middlewares/logger.middleware';
 
 dotenv.config();
 
@@ -20,7 +21,8 @@ app.get('/health', (_req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// Routes will be mounted here as you build them
+app.use(requestLogger);
+
 app.use('/auth', authRouter);
 app.use('/api-keys', apiKeysRouter);
 
