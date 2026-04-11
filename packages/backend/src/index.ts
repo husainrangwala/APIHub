@@ -7,6 +7,8 @@ import { requireApiKey } from './middlewares/apikey.middleware';
 import { errorHandler } from './middlewares/error.middleware';
 import { rateLimitMiddleware } from './middlewares/ratelimit.middleware';
 import { requestLogger } from './middlewares/logger.middleware';
+import { analyticsRouter } from './modules/analytics/analytics.router';
+import { requireAuth } from './middlewares/auth.middleware';
 
 dotenv.config();
 
@@ -21,13 +23,12 @@ app.get('/health', (_req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-app.use(requestLogger);
-
 app.use('/auth', authRouter);
-app.use('/api-keys', apiKeysRouter);
+app.use('/api-keys', requireAuth, requestLogger, apiKeysRouter);
+app.use('/analytics', requireAuth, requestLogger, analyticsRouter);
 
 // test route — protected by API key (not JWT)
-app.get('/test', requireApiKey, rateLimitMiddleware, (req, res) => {
+app.get('/test', requireAuth, requireApiKey, rateLimitMiddleware, requestLogger, (req, res) => {
     res.json({ message: 'Valid API key', user: req.user });
 });
 

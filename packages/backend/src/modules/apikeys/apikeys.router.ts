@@ -14,7 +14,8 @@ apiKeysRouter.post('/', async (req: Request, res: Response, next: NextFunction) 
         const { name } = CreateApiKeySchema.parse(req.body);
         const userId = req.user?.id;
         if (!userId) {
-            throw new AppError('User ID missing in request', 400);
+            next(new AppError('User ID missing in request', 400));
+            return;
         }
         const apiKey = await createApiKey(userId, name);
         res.status(201).json({ message: 'API key created successfully', apiKey });
@@ -27,7 +28,8 @@ apiKeysRouter.get('/', async (req: Request, res: Response, next: NextFunction) =
     try {
         const userId = req.user?.id;
         if (!userId) {
-            throw new AppError('User ID missing in request', 400);
+            next(new AppError('User ID missing in request', 400));
+            return;
         }
         const keys = await listApiKeys(userId);
         res.json({ apiKeys: keys });
@@ -42,10 +44,12 @@ apiKeysRouter.delete('/:id', async (req: Request, res: Response, next: NextFunct
         let keyId = RevokeApiParamsSchema.parse(req.params).id;
 
         if (!userId) {
-            throw new AppError('User ID missing in request', 400);
+            next(new AppError('User ID missing in request', 400));
+            return;
         }
         if (!keyId) {
-            throw new AppError('API key ID is required', 400);
+            next(new AppError('API key ID is required', 400));
+            return;
         }
 
         const revokedKey = await revokeApiKey(userId, keyId);
